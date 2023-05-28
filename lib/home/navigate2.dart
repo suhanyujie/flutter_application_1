@@ -9,19 +9,6 @@ class NavigationRailPage2 extends StatefulWidget {
   State<NavigationRailPage2> createState() => _NavigationRailPage2State();
 }
 
-const _navBarItems = [
-  BottomNavigationBarItem(
-    icon: Icon(Icons.home_outlined),
-    activeIcon: Icon(Icons.home_rounded),
-    label: 'Home',
-  ),
-  BottomNavigationBarItem(
-    icon: Icon(Icons.bookmark_border_outlined),
-    activeIcon: Icon(Icons.bookmark_rounded),
-    label: 'Bookmarks',
-  ),
-];
-
 class _NavigationRailPage2State extends State<NavigationRailPage2> {
   int _selectedIndex = 0;
 
