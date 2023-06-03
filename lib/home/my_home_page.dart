@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -20,6 +21,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  String _inputDir = ".";
+  String _outputDir = "./output/";
 
   void _incrementCounter() {
     setState(() {
@@ -37,7 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Container(
+      body: SizedBox(
         width: 480,
         height: 320,
         child: Center(
@@ -47,15 +50,21 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   OutlinedButton(
-                    onPressed: () {
-                      print('点击 提交');
+                    onPressed: () async {
+                      var dir = await FilePicker.platform.getDirectoryPath(
+                          dialogTitle: "选择文件夹", lockParentWindow: false);
+                      if (dir == null) {
+                        return;
+                      }
+                      print(dir);
+                      _inputDir = dir!;
                     },
-                    child: Text('选择 xlsx 目录'),
+                    child: const Text('选择 xlsx 目录'),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
-                  Expanded(
+                  const Expanded(
                     child: TextField(
                       maxLines: 1,
                       obscureText: true,
@@ -71,14 +80,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   OutlinedButton(
-                      onPressed: () {
-                        print('clicked 2');
+                      onPressed: () async {
+                        var dir = await FilePicker.platform.getDirectoryPath(
+                            dialogTitle: "选择文件夹", lockParentWindow: false);
+                        if (dir == null) {
+                          return;
+                        }
+                        print(dir);
+                        _outputDir = dir!;
                       },
-                      child: Text('选择目标目录')),
-                  SizedBox(
+                      child: const Text('选择目标目录')),
+                  const SizedBox(
                     width: 10,
                   ),
-                  Expanded(
+                  const Expanded(
                     child: TextField(
                       maxLines: 1,
                       obscureText: true,
@@ -98,7 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       onPressed: () {
                         print('start transfer...');
                       },
-                      child: Text('开始转换'),
+                      child: const Text('开始转换'),
                     ),
                   ),
                 ],

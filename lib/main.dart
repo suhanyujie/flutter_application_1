@@ -1,9 +1,5 @@
-import 'dart:io';
-import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/home/navigate.dart';
 import 'package:flutter_application_1/home/navigate2.dart';
-import 'home/my_home_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,8 +23,6 @@ class MyApp extends StatelessWidget {
         // reload" button in a Flutter-supported IDE, or press "r" if you used
         // the command line to start the app).
         //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),

@@ -10,15 +10,15 @@ class NavigationRailPage2 extends StatefulWidget {
 }
 
 class _NavigationRailPage2State extends State<NavigationRailPage2> {
-  int _selectedIndex = 0;
+  final int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       initialRoute: '/first',
       routes: {
-        '/first': (context) => MyHomePage(title: 'Home page'),
-        '/second': (context) => Convert2Json(),
+        '/first': (context) => const MyHomePage(title: 'Home page'),
+        '/second': (context) => const Convert2Json(),
       },
     );
   }
