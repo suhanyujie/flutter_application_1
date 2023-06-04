@@ -10,24 +10,36 @@ Future<bool> convert2JsonFile(String inputDir, String outputDir) async {
     }
     var ext = getFileExtension(entity.path);
     List<String> allowExtArr = ["xlsx", "csv"];
-    if (allowExtArr.contains(ext)) {
+    if (!allowExtArr.contains(ext)) {
       continue;
     }
-    var excelObj = Excel.decodeBytes(File(entity.path).readAsBytesSync());
-    var sheet = excelObj.tables['Sheet1'];
-
-    List<Map<String, dynamic>> jsonData = [];
-    for (var row in sheet!.rows) {
-      Map<String, dynamic> rowData = {};
-      for (var cell in row) {
-        var columnName = cell!.value;
-        var value = cell.value;
-        rowData[columnName] = value;
-      }
-      jsonData.add(rowData);
-    }
-
     print(entity.path);
+    var excelObj = Excel.decodeBytes(File(entity.path).readAsBytesSync());
+    var tables = excelObj.tables;
+    tables.forEach((tableName, table) {});
+    var tableNames = tables.keys.toList();
+    for (var i = 0; i < tableNames.length; i++) {
+      var table = tables[tableNames[i]];
+      print(tableNames[i]);
+      var dataList = getOneTableData(tableNames[i], table);
+      print(dataList);
+      break;
+    }
+    break;
+
+    // var sheet = excelObj.tables['Sheet1'];
+
+    // List<Map<String, dynamic>> jsonData = [];
+
+    // for (var row in sheet!.rows) {
+    //   Map<String, dynamic> rowData = {};
+    //   for (var cell in row) {
+    //     var columnName = cell!.value;
+    //     var value = cell.value;
+    //     rowData[columnName] = value;
+    //   }
+    //   jsonData.add(rowData);
+    // }
   }
   return true;
 }
@@ -39,4 +51,54 @@ String getFileExtension(String filePath) {
     return parts.last; // 返回最后一个元素作为后缀
   }
   return '';
+}
+
+List<String> getOneTableHeaders(String tableName, Sheet? sheet) {
+  List<String> headers = [];
+  if (sheet == null) {
+    return headers;
+  }
+  for (var i = 0; i < sheet.maxRows; i++) {
+    var row = sheet.row(i);
+    if (i == 0) {
+      for (var colNum = 0; colNum < sheet.maxCols; colNum++) {
+        Data? cell = row[colNum];
+        if (cell == null) {
+          headers.add("");
+        } else {
+          headers.add(cell.value.toString());
+        }
+      }
+    }
+  }
+
+  return headers;
+}
+
+List<Map<String, dynamic>>? getOneTableData(String tableName, Sheet? sheet) {
+  List<Map<String, dynamic>> dataList = [];
+  if (sheet == null) {
+    return dataList;
+  }
+
+  List<String> headers = getOneTableHeaders(tableName, sheet);
+  for (var i = 0; i < sheet.maxRows; i++) {
+    Map<String, dynamic> rowData = {};
+    if (i == 0) {
+      continue;
+    }
+
+    var row = sheet.row(i);
+    for (var colNum = 0; colNum < sheet.maxCols; colNum++) {
+      Data? cell = row[colNum];
+      String tmpKey = headers[colNum].toString();
+      if (cell == null) {
+        rowData[tmpKey] = "";
+      } else {
+        rowData[tmpKey] = cell.value.toString();
+      }
+    }
+    dataList.add(rowData);
+  }
+  return dataList;
 }
