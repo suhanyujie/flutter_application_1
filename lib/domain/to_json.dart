@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:excel/excel.dart';
+import 'dart:convert';
+import 'package:path/path.dart' as p;
 
 // 将一个目录下的 xlsx、csv 文件 转换为 json 文件，放到 outputDir 下
 Future<bool> convert2JsonFile(String inputDir, String outputDir) async {
@@ -8,49 +10,35 @@ Future<bool> convert2JsonFile(String inputDir, String outputDir) async {
     if (await FileSystemEntity.isDirectory(entity.path)) {
       continue;
     }
-    var ext = getFileExtension(entity.path);
+    var (_, ext) = getFileExtension(entity.path);
+    var fileName = p.basenameWithoutExtension(entity.path);
+    var targetFile = "$outputDir/$fileName.json";
     List<String> allowExtArr = ["xlsx", "csv"];
     if (!allowExtArr.contains(ext)) {
       continue;
     }
-    print(entity.path);
+    // print(entity.path);
     var excelObj = Excel.decodeBytes(File(entity.path).readAsBytesSync());
     var tables = excelObj.tables;
-    tables.forEach((tableName, table) {});
     var tableNames = tables.keys.toList();
-    for (var i = 0; i < tableNames.length; i++) {
+    var jsonStr = "";
+    var enc = const JsonEncoder.withIndent("    ");
+    for (var i = 0; i < tableNames.length;) {
       var table = tables[tableNames[i]];
-      print(tableNames[i]);
       var dataList = getOneTableData(tableNames[i], table);
-      print(dataList);
+      jsonStr = enc.convert(dataList);
       break;
     }
-    break;
-
-    // var sheet = excelObj.tables['Sheet1'];
-
-    // List<Map<String, dynamic>> jsonData = [];
-
-    // for (var row in sheet!.rows) {
-    //   Map<String, dynamic> rowData = {};
-    //   for (var cell in row) {
-    //     var columnName = cell!.value;
-    //     var value = cell.value;
-    //     rowData[columnName] = value;
-    //   }
-    //   jsonData.add(rowData);
-    // }
+    // 将转换后的字符串写入文件 todo
+    await writeToFile(targetFile, jsonStr);
   }
   return true;
 }
 
-String getFileExtension(String filePath) {
+(String, String) getFileExtension(String filePath) {
   var fileName = filePath.split('/').last; // 获取文件名
   var parts = fileName.split('.'); // 分割文件名和后缀
-  if (parts.length > 1) {
-    return parts.last; // 返回最后一个元素作为后缀
-  }
-  return '';
+  return (parts.first, parts.last);
 }
 
 List<String> getOneTableHeaders(String tableName, Sheet? sheet) {
@@ -101,4 +89,17 @@ List<Map<String, dynamic>>? getOneTableData(String tableName, Sheet? sheet) {
     dataList.add(rowData);
   }
   return dataList;
+}
+
+writeToFile(String fName, String strData) async {
+  // 检查文件是否存在
+  File fh;
+  if (!await File(fName).exists()) {
+    // 如果不存在，则创建文件
+    fh = await File(fName).create();
+  } else {
+    fh = File(fName);
+  }
+  // 写入数据 todo
+  return fh.writeAsStringSync(strData, flush: true);
 }
